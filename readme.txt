@@ -11,8 +11,8 @@ Generates a probability distribution for the likelihood that 256-bit ECDSA signa
 OUTPUTS:
 > (optional) two graphs: a cumulative probability distribution and underlying probability distribution function
 > (optional) a .mat file with the results of your simulation
-> the year at which Bitcoin is 50% likely to be broken by according to your input assumptions -- this is the x-intercept of when the cumulative probability crosses 0.5
-> the individual year in which Bitcoin is most likely to be broken according to your input assumptions -- this is the mode of the of the probability distribution of outcomes
+> the year at which ECDSA is 50% likely to be broken by according to your input assumptions -- this is the x-intercept of when the cumulative probability crosses 0.5
+> the individual year in which ECDSA is most likely to be broken according to your input assumptions -- this is the mode of the of the probability distribution of outcomes
 
 SPEED-RELATED SETTINGS:
 These settings do not affect the model, but do affect the noisiness of the results as well as how fast the program will run.
@@ -32,7 +32,7 @@ PARAMETERS:
 
 [par.parameter_uncertainty] - Uncertainty is applied as the standard deviation for each of those variables when simulating their range of possible values (randomly sampled from a Gaussian probability distribution).
 
-[par.maximum_acceptableRisk] - ECDSA is deemed ìbrokenî when the probability of at least one public key being reversed into its respective private key in a given year exceeds this value (in percent).
+[par.maximum_acceptableRisk] - ECDSA is deemed ‚Äúbroken‚Äù when the probability of at least one public key being reversed into its respective private key in a given year exceeds this value (in percent).
 
 [par.req_runTime] - The amount of time available to the QC to run in order to crack a given public key. The default is set conservatively to one week, although due to the high value of the first couple of addresses to be cracked, this time could arguably be set more accurately to several months.
 
