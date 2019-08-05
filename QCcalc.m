@@ -3,7 +3,8 @@ clear; close all;
 %% INPUT PARAMETERS
 par.yearly_increaseInQubits = 40; % in percent (0-100) -- note: 100% improvement is doubling the # qubits every year.
 par.yearly_errorRateImprovement = 20; % in percent (0-100) -- note: 50% improvement is cutting the error rate in half every year.
-par.yearly_algorithmicImprovement = 10; % in percent(0-100) -- this directly impacts the number of logical qubits required.
+par.yearly_algorithmicImprovement = 10; % in percent(0-100) -- note: this is a discounting term, similar to the error rate improvement,
+% so 50% improvement is cutting the cost of the calculation in half.
 par.parameter_uncertainty = 25; % percent uncertainty about the above parameters
 % NOTE: uncertainty here (and below) is equivalent to one standard deviation of a Gaussian distribution 
 % centered on the given parameter's specified value
