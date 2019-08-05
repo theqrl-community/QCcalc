@@ -26,7 +26,8 @@ opt.plotGridlines = 1; % adds gridlines to the cumulative probability plot
 opt.wannaSavePlots = 1; % if 0, wil not save the plots
 opt.wannaSaveResults = 0;
 opt.nSamples = 5000; % higher count --> longer runtime, less-noisy estimates
-opt.nYears = 50; % making this number larger will slow down the simulation
+opt.nYears = 100; % should be large enough to contain the majority of the resulting probability distribution distribution
+% if 100 is too 'zoomed-out' 50 is a good option
 
 %% MAIN CODE -- QC calc
 
@@ -141,7 +142,11 @@ paramStr = [num2str(par.yearly_increaseInQubits) 'x' num2str(par.yearly_errorRat
 %% Plots and saving
 if opt.wannaPlot
     close all;
-    histogram(howLong_tilBroken,round((opt.nYears-min(howLong_tilBroken))/2))
+    if opt.nYears == 50
+        histogram(howLong_tilBroken) % binning fix not necessary for 50-year plots
+    else
+        histogram(howLong_tilBroken,round((opt.nYears-min(howLong_tilBroken))/2)) % 2 years to a bin
+    end
     xlim([0 opt.nYears]);
     title('How long it will take for QCs to break ECDSA','FontSize',12)
     xlabel('# years','FontSize',10)
