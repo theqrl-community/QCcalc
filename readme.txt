@@ -50,7 +50,8 @@ ADDITIONAL OPTIONS:
 par.yearly_increaseInQubits 'x' par.yearly_errorRateImprovement 'x' par.yearly_algorithmicImprovement 'x' par.parameter_uncertainty
 [opt.plotGridlines] - adds gridlines to the cumulative probability plot
 [opt.wannaSaveResults] - will save the cumulative probability results to a .mat file in your current directory
-
+[opt.figSize] - sets the size of your plot figures [horizontal vertical]
+[opt.inclFigTitles] - makes plots without titles if set to 0
 
 
 
