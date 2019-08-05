@@ -133,7 +133,7 @@ end
 
 cumulativeProb = nansum(chanceBroken,1)/opt.nSamples;
 disp(['50% chance of being broken in ' num2str(find(cumulativeProb>0.5,1,'first')) ' years']);
-disp(['most likely year to be broken in: ' num2str(mode(howLong_tilBroken))]);
+disp(['most likely year to be broken in: year ' num2str(mode(howLong_tilBroken))]);
 paramStr = [num2str(par.yearly_increaseInQubits) 'x' num2str(par.yearly_errorRateImprovement) ...
     'x' num2str(par.yearly_algorithmicImprovement) 'x' num2str(par.parameter_uncertainty)];
 
