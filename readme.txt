@@ -34,7 +34,7 @@ PARAMETERS:
 
 [par.maximum_acceptableRisk] - ECDSA is deemed “broken” when the probability of at least one public key being reversed into its respective private key in a given year exceeds this value (in percent).
 
-[par.req_runTime] - The amount of time available to the QC to run in order to crack a given public key. The default is set conservatively to one week, although due to the high value of the first couple of addresses to be cracked, this time could arguably be set more accurately to several months.
+[par.req_runTime] - The amount of time available to the QC to run in order to crack a given public key. The default is set conservatively to one week, although in the case of cryptocurrency, due to the high value of the first couple of addresses to be cracked, this time could arguably be set more accurately to several months.
 
 [par.public_nPhysQubits] - The size of the largest quantum computer in the current year that you are running the script (provides the start point from which the 'nQubits' variable is scaled).
 
@@ -44,14 +44,23 @@ PARAMETERS:
 
 [par.ECDSA_keySize] - will work for values of 256, 384, and 521
 
-ADDITIONAL OPTIONS:
-[opt.wannaPlot] - set to 1 to generate the cumulative probability and probability distribution plots
-[opt.wannaSavePlots] - will save the plots to your current directory. NOTE: to help with referencing the results of previous runs, the numbers at the end of the save file are:
-par.yearly_increaseInQubits 'x' par.yearly_errorRateImprovement 'x' par.yearly_algorithmicImprovement 'x' par.parameter_uncertainty
-[opt.plotGridlines] - adds gridlines to the cumulative probability plot
+OPTIONS:
 [opt.wannaSaveResults] - will save the cumulative probability results to a .mat file in your current directory
+
+[opt.wannaPlot] - set to 1 to generate the cumulative probability and probability distribution plots
+
+[opt.wannaSavePlots] - will save the plots to your current directory. NOTE: to help with referencing the results of previous runs, the numbers at the end of the save file are:
+
+par.yearly_increaseInQubits 'x' par.yearly_errorRateImprovement 'x' par.yearly_algorithmicImprovement 'x' par.parameter_uncertainty '_' par.req_runTime 'hrs' '_' opt.nYears 'yrs'
+
+[opt.plotGridlines] - adds gridlines to the cumulative probability plot
+
 [opt.figSize] - sets the size of your plot figures [horizontal vertical]
+
 [opt.inclFigTitles] - makes plots without titles if set to 0
 
+[opt.inclXlabel] - toogle x axis labels
 
+[opt.inclXticks] - toggle x axis tick labels
 
+[opt.inclYlabel] - toggle y axis labels
