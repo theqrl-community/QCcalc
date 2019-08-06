@@ -1,16 +1,16 @@
 clear; close all;
 
 %% INPUT PARAMETERS
-par.yearly_increaseInQubits = 40; % in percent (0-100) -- note: 100% improvement is doubling the # qubits every year.
-par.yearly_errorRateImprovement = 20; % in percent (0-100) -- note: 50% improvement is cutting the error rate in half every year.
-par.yearly_algorithmicImprovement = 10; % in percent(0-100) -- note: this is a discounting term, similar to the error rate improvement,
-% so 50% improvement is cutting the cost of the calculation in half.
-par.parameter_uncertainty = 25; % percent uncertainty about the above parameters
+% set these values for yourself
+par.yearly_increaseInQubits = 10; % in percent (0-100) -- note: 100% improvement is doubling the # qubits every year.
+par.yearly_errorRateImprovement = 10; % in percent (0-100) -- note: 50% improvement is cutting the error rate in half every year.
+par.yearly_algorithmicImprovement = 10; % in percent(0-100) -- this directly impacts the number of logical qubits required.
+par.parameter_uncertainty = 10; % percent uncertainty about the above parameters
 % NOTE: uncertainty here (and below) is equivalent to one standard deviation of a Gaussian distribution 
 % centered on the given parameter's specified value
 par.maximum_acceptableRisk = 1; % the maximum acceptable percent chance that ECDSA is cracked in a given year;
 % once that chance exceeds this value, ECDSA is defined as "broken"
-par.req_runTime = 24*30; % hours
+par.req_runTime = 24*7*1; % hours (default: 1 week)
 par.public_nPhysQubits = 72; % from Google's Bristlecone chip.
 % Rigetti's 128 qubit machine is a slightly less conservative alternative
 par.public_physErrRate = 0.001; % 0.1 percent
@@ -21,13 +21,19 @@ par.ECDSA_keySize = 256; % Bitcoin is 256-bit, for reference, as are most 'altco
 % this model will work on any of the following key sizes tho    ugh: [256 384 521];
 
 % Options:
-opt.wannaPlot = 1; % if 0, will not generate plots
-opt.plotGridlines = 1; % adds gridlines to the cumulative probability plot
-opt.wannaSavePlots = 1; % if 0, wil not save the plots
-opt.wannaSaveResults = 0;
 opt.nSamples = 5000; % higher count --> longer runtime, less-noisy estimates
 opt.nYears = 100; % should be large enough to contain the majority of the resulting probability distribution distribution
 % if 100 is too 'zoomed-out' 50 is a good option
+
+opt.wannaSaveResults = 0;
+opt.wannaPlot = 1; % if 0, will not generate plots
+opt.wannaSavePlots = 0; % if 0, wil not save the plots
+opt.plotGridlines = 1; % adds gridlines to the cumulative probability plot
+opt.figSize = [5 3]; % default: [5 3];
+opt.inclFigTitles = 1;
+opt.inclXlabel = 1;
+opt.inclXticks = 1;
+opt.inclYlabel = 1;
 
 %% MAIN CODE -- QC calc
 
@@ -55,8 +61,7 @@ end
 sample_qubitGrowth = []; sample_errRateDecline = []; sample_logErrRate = []; sample_algoImprovement = [];
 % Now, sample n values of the nQubit growth, error rate deline, and target logical error rate from a normal distribution
 % centered on each parameter's user-specified value, with sigma = user-specified 'uncertainty'
-% Note: technology doesn't progress backwards, so we throw out all the potential scenarios
-% where that happens
+% Note: technology doesn't progress backwards, so we throw out all the potential samples where that happens
 while length(sample_qubitGrowth) < opt.nSamples
     potential_qG = normrnd(growthFactor_nQubits,growthFactor_nQubits*par.parameter_uncertainty/100,1,opt.nSamples);
     potential_qG(find(potential_qG < 1)) = NaN;
@@ -66,7 +71,8 @@ end
 
 while length(sample_errRateDecline) < opt.nSamples
     potential_eRD = normrnd(declineFactor_errRate,(1 - declineFactor_errRate)*par.parameter_uncertainty/100,1,opt.nSamples);
-    potential_eRD(find(potential_eRD < 0)) = NaN; potential_eRD(find(potential_eRD > 1)) = NaN;
+    potential_eRD(find(potential_eRD < 0)) = NaN; 
+    potential_eRD(find(potential_eRD > 1)) = NaN;
     sample_errRateDecline = [sample_errRateDecline potential_eRD];
     sample_errRateDecline = sample_errRateDecline(~isnan(sample_errRateDecline));
 end
@@ -80,7 +86,8 @@ end
 
 while length(sample_algoImprovement) < opt.nSamples
     potential_aI = normrnd(algorithmicImprovement,(1-algorithmicImprovement)*par.parameter_uncertainty/100,1,opt.nSamples);
-    potential_aI(find(potential_aI < 0)) = NaN; potential_aI(find(potential_aI > 1)) = NaN;
+    potential_aI(find(potential_aI < 0)) = NaN; 
+    potential_aI(find(potential_aI > 1)) = NaN;
     sample_algoImprovement = [sample_algoImprovement potential_aI];
     sample_algoImprovement = sample_algoImprovement(~isnan(sample_algoImprovement));
 end
@@ -135,62 +142,54 @@ end
 
 cumulativeProb = nansum(chanceBroken,1)/opt.nSamples;
 disp(['50% chance of being broken in ' num2str(find(cumulativeProb>0.5,1,'first')) ' years']);
-disp(['most likely year to be broken in: year ' num2str(mode(howLong_tilBroken))]);
-paramStr = [num2str(par.yearly_increaseInQubits) 'x' num2str(par.yearly_errorRateImprovement) ...
-    'x' num2str(par.yearly_algorithmicImprovement) 'x' num2str(par.parameter_uncertainty)];
+disp(['most likely year to be broken in: ' num2str(mode(howLong_tilBroken))]);
+paramStr = [num2str(round(par.yearly_increaseInQubits)) 'x' num2str(round(par.yearly_errorRateImprovement)) ...
+    'x' num2str(round(par.yearly_algorithmicImprovement)) 'x' num2str(round(par.parameter_uncertainty)) '_' ...
+    num2str(round(par.req_runTime)) 'hrs_' num2str(round(opt.nYears)) 'yrs'];
 
 %% Plots and saving
 if opt.wannaPlot
     close all;
-    if opt.nYears == 50
-        histogram(howLong_tilBroken) % binning fix not necessary for 50-year plots
-    else
-        histogram(howLong_tilBroken,round((opt.nYears-min(howLong_tilBroken))/2)) % 2 years to a bin
-    end
+%     histogram(howLong_tilBroken,'BinEdges',[2:2:opt.nYears]) 
+%       removed histogram() function here in favor of the older hist() in order to
+%       maximize compatibility with Octave
+    hist(howLong_tilBroken,[2:2:opt.nYears]) % 2 years to a bin
+    h = findobj(gca,'Type','patch');
+    set(h,'FaceColor',[218 0 0]/255)
     xlim([0 opt.nYears]);
-    title('How long it will take for QCs to break ECDSA','FontSize',12)
-    xlabel('# years','FontSize',10)
-    ylabel('relative likelihood')
+    if opt.inclFigTitles, title('How long it will take for QCs to break ECDSA','FontSize',10); end
+    if opt.inclYlabel, ylabel('relative likelihood','FontSize',10); end
     set(gca,'YTickLabel',[]);
-    set(gca,'XTick',[0:opt.nYears/10:opt.nYears])
-    set(gcf, 'PaperPosition', [0 0 5 3])    % can be bigger than screen
-    set(gcf, 'PaperSize', [5 3])    % Same, but for PDF output
-    
-    if opt.wannaSavePlots, print(gcf, ['simResults_' paramStr '_' num2str(opt.nYears) 'yrs'], '-dpng', '-r300' ); end
+    if opt.inclXticks, set(gca,'XTick',[0:opt.nYears/10:opt.nYears]); else set(gca,'XTick',[]); end
+    if opt.inclXlabel, xlabel('# years','FontSize',10); end
+    set(gcf, 'PaperPosition', [0 0 opt.figSize])    % can be bigger than screen
+    set(gcf, 'PaperSize', [opt.figSize])    % Same, but for PDF output
+    if opt.wannaSavePlots, print(gcf, ['simResults_' paramStr], '-dpng', '-r300' ); end
 end
 
 if opt.wannaPlot
     figure;
-    plot(cumulativeProb,'LineWidth',2);
-    xlim([0 opt.nYears]);
-    title('Cumulative probability of ECDSA being broken by QC','FontSize',10)
-    xlabel('# years','FontSize',10)
-    ylabel('chance of being broken','FontSize',10);
-    set(gca,'XTick',[0:opt.nYears/10:opt.nYears])
-    set(gcf, 'PaperPosition', [0 0 5 3])    % can be bigger than screen
-    set(gcf, 'PaperSize', [5 3])    % Same, but for PDF output
+    plot(cumulativeProb,'LineWidth',3,'Color',[218 0 0]/255);
+    xlim([0 opt.nYears]); ylim([0 1]);
+    if opt.inclFigTitles, title('Cumulative probability of ECDSA being broken by QC','FontSize',10); end
+    if opt.inclYlabel, ylabel('chance broken','FontSize',10); end
+    if opt.inclXticks, set(gca,'XTick',[0:opt.nYears/10:opt.nYears]); else set(gca,'XTick',[]); end
+    if opt.inclXlabel, xlabel('# years','FontSize',10); end
+    set(gcf, 'PaperPosition', [0 0 opt.figSize])    % can be bigger than screen
+    set(gcf, 'PaperSize', opt.figSize)    % Same, but for PDF output
     if opt.plotGridlines, grid on; end 
     hold on;
-    if opt.wannaSavePlots, print(gcf, ['cumulativeDist_' paramStr '_' num2str(opt.nYears) 'yrs'], '-dpng', '-r300' ); end
+    if opt.wannaSavePlots, print(gcf, ['cumulativeDist_' paramStr], '-dpng', '-r300' ); end
 end
 
 results.cumulativeProb = cumulativeProb;
+results.year_50percentRisk = find(cumulativeProb>0.5,1,'first');
+results.mostLikelyYearBroken = mode(howLong_tilBroken);
+results.howLong_tilBroken = howLong_tilBroken;
 
 % you can save a file containing the results, parameters, and options that
 % you used by setting 'wannaSave' to 1 in the input parameters.
-c = date; runCt = 1; checkingForFiles = 1;
-filename = ['QC_threatCalc' num2str(runCt) '_' c];
-while checkingForFiles % this part just automatically increments the filename so you don't overwrite your previous saves
-    if ~exist([filename '.mat'],'file'), checkingForFiles = 0; end
-    if exist([filename '.mat'],'file')
-        runCt = runCt + 1;
-        filename = ['QC_threatCalc' num2str(runCt) '_' c];
-    end
-end
+filename = ['QC_threatCalc_' paramStr];
 if opt.wannaSaveResults
     save(filename,'results','par','opt');
 end
-
-
-
-
