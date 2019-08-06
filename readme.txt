@@ -55,9 +55,9 @@ par.yearly_increaseInQubits 'x' par.yearly_errorRateImprovement 'x' par.yearly_a
 
 [opt.plotGridlines] - adds gridlines to the cumulative probability plot
 
-[opt.figSize] - set the size of the figures [horizontal vertical]
+[opt.figSize] - sets the size of your plot figures [horizontal vertical]
 
-[opt.inclFigTitles] - toggle figure titles
+[opt.inclFigTitles] - makes plots without titles if set to 0
 
 [opt.inclXlabel] - toogle x axis labels
 
