@@ -3,8 +3,8 @@ clear; close all;
 %% INPUT PARAMETERS
 % set these values for yourself
 par.yearly_increaseInQubits = 10; % in percent (0-100) -- note: 100% improvement is doubling the # qubits every year.
-par.yearly_errorRateImprovement = 10; % in percent (0-100) -- note: 50% improvement is cutting the error rate in half every year.
-par.yearly_algorithmicImprovement = 10; % in percent(0-100) -- this directly impacts the number of logical qubits required.
+par.yearly_errorRateImprovement = 10; % in percent (0-100) -- note: 50% = cutting the error rate in half every year.
+par.yearly_algorithmicImprovement = 10; % in percent(0-100) -- note: 50% = cutting the # of LOGICAL qubits required in half every year
 par.parameter_uncertainty = 10; % percent uncertainty about the above parameters
 % NOTE: uncertainty here (and below) is equivalent to one standard deviation of a Gaussian distribution 
 % centered on the given parameter's specified value
@@ -34,6 +34,8 @@ opt.inclFigTitles = 1;
 opt.inclXlabel = 1;
 opt.inclXticks = 1;
 opt.inclYlabel = 1;
+opt.histogramBinSize = 1; % (in years); 2 by default, can change to lower or higher if 2-year bins doesn't do a good job of 
+% capturing the shape of your resulting distribution
 
 %% MAIN CODE -- QC calc
 
@@ -153,7 +155,7 @@ if opt.wannaPlot
 %     histogram(howLong_tilBroken,'BinEdges',[2:2:opt.nYears]) 
 %       removed histogram() function here in favor of the older hist() in order to
 %       maximize compatibility with Octave
-    hist(howLong_tilBroken,[2:2:opt.nYears]) % 2 years to a bin
+    hist(howLong_tilBroken,[2:opt.histogramBinSize:opt.nYears]) % can set binSize in opts
     h = findobj(gca,'Type','patch');
     set(h,'FaceColor',[218 0 0]/255)
     xlim([0 opt.nYears]);
