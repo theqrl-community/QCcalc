@@ -159,6 +159,8 @@ if opt.wannaPlot
     h = findobj(gca,'Type','patch');
     set(h,'FaceColor',[218 0 0]/255)
     xlim([0 opt.nYears]);
+    binCounts = histc(howLong_tilBroken,2:opt.histogramBinSize:opt.nYears);
+    ylim([0 max(binCounts)*1.10]); % get consistent y limits
     if opt.inclFigTitles, title('How long it will take for QCs to break ECDSA','FontSize',10); end
     if opt.inclYlabel, ylabel('relative likelihood','FontSize',10); end
     set(gca,'YTickLabel',[]);
