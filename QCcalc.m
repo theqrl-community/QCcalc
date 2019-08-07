@@ -166,7 +166,7 @@ if opt.wannaPlot
     if opt.inclXlabel, xlabel('# years','FontSize',10); end
     set(gcf, 'PaperPosition', [0 0 opt.figSize])    % can be bigger than screen
     set(gcf, 'PaperSize', [opt.figSize])    % Same, but for PDF output
-    if opt.wannaSavePlots, print(gcf, ['simResults_' paramStr], '-dpng', '-r300' ); end
+    if opt.wannaSavePlots, print(gcf, ['simResults_' paramStr '_bin' num2str(opt.histogramBinSize)], '-dpng', '-r300' ); end
 end
 
 if opt.wannaPlot
