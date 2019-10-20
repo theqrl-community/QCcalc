@@ -3,18 +3,19 @@
 
 // Overall load multiplies by the total threads in your system
 // to get your ideal load. Good for doing other things while compiling.
-$overall_load = 0.8;
+$overall_load = 0.7;
 
 // 0 to go by overall_load, otherwise set number of threads
 // Should be renamed by processes to be more accurate.
 $threads=0; 
 
+// Different configuration values
 $y_increaseInQubits = range(25, 200, 25);
 $y_algorithmicImprovement = range(25, 200, 25);
 $y_errorRateImprovement = range(25, 200, 25);
 $runTime = [24,(24*7),(24*7*4),(24*7*26)];
 $uncertainty = range(25,100,25);
-
+$samples = 1500;
 
 // Count processes with name...
 function count_processes() {
@@ -63,7 +64,7 @@ foreach ($y_increaseInQubits as $y_increaseInQubits_value) {
 					}
 
 					// sleep(1);
-					shell_exec("flatpak run org.octave.Octave -Wq QCcalc.m $y_increaseInQubits_value $y_algorithmicImprovement_value $y_errorRateImprovement_value $uncertainty_value $runTime_value > /dev/null &");
+					shell_exec("flatpak run org.octave.Octave -Wq QCcalc.m $y_increaseInQubits_value $y_algorithmicImprovement_value $y_errorRateImprovement_value $uncertainty_value $runTime_value $samples > /dev/null &");
 					$file_counter++;
 
 

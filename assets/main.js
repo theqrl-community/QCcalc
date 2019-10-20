@@ -18,8 +18,8 @@ var layout = {
         showgrid: false
     },
     xaxis: {
-		autorange: false,
-      range: [2019,2060]
+        autorange: true,
+        range: [2019,2060]
     },
     // to highlight the timestamp we use shapes and create a rectangular
     shapes: [
@@ -81,10 +81,12 @@ function update_plot() {
   	var increaseInQubits = $('.qc_progress [name=increaseInQubits]').val();
   	var algorithmicImprovement = $('.qc_progress [name=algorithmicImprovement]').val();
   	var errorRateImprovement = $('.qc_progress [name=errorRateImprovement]').val();
-  	
-  	var text = "cumulative_prob_168hrs_"+increaseInQubits+"x"+algorithmicImprovement+"x"+errorRateImprovement+"x25_100yrs";
+  	var runtime = $('.qc_progress [name=runTime]').val();
+    var uncertainty = $('.qc_progress [name=uncertainty]').val();
 
-  	console.log(text);
+  	var text = "cumulative_prob_"+runtime+"hrs_"+increaseInQubits+"x"+algorithmicImprovement+"x"+errorRateImprovement+"x"+uncertainty+"_100yrs";
+
+  	console.log(text,[stuff[text]]);
 
 	Plotly.animate('myDiv', 
 		{
@@ -93,11 +95,11 @@ function update_plot() {
 		}, 
 		{
 			transition: {
-			 	duration: 150,
+			 	duration: 50,
 			 	easing: 'cubic-in-out'
 			},
 			frame: {
-				duration: 150
+				duration: 50
 			}
 		});
 }
@@ -108,7 +110,7 @@ $(function() {
     	stuff = json;   
     	update_plot();       
 	});    
-	$('input').on('load change textInput input', function() {
+	$('input, select').on('load change textInput input', function() {
   		update_plot();
 	});
 })

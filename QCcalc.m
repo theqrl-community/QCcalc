@@ -6,15 +6,17 @@ par.yearly_errorRateImprovement = 10; % in percent (0-100) -- note: 50% = cuttin
 par.yearly_algorithmicImprovement = 10; % in percent(0-100) -- note: 50% = cutting the # of LOGICAL qubits required in half every year
 par.parameter_uncertainty = 10; % percent uncertainty about the above parameters
 par.req_runTime = 24*7*1; % hours (default: 1 week)
+opt.nSamples = 50; % higher count --> longer runtime, less-noisy estimates
 
 %% INPUT PARAMETERS
 % set these values for yourself
-if length(argv()) == 5
+if length(argv()) == 6
 par.yearly_increaseInQubits = str2num(argv(){1}); % in percent (0-100) -- note: 100% improvement is doubling the # qubits every year.
 par.yearly_errorRateImprovement = str2num(argv(){2}); % in percent (0-100) -- note: 50% = cutting the error rate in half every year.
 par.yearly_algorithmicImprovement = str2num(argv(){3}); % in percent(0-100) -- note: 50% = cutting the # of LOGICAL qubits required in half every year
 par.parameter_uncertainty = str2num(argv(){4}); % percent uncertainty about the above parameters
 par.req_runTime = str2num(argv(){5}); % hours (default: 1 week)
+opt.nSamples = 200; % higher count --> longer runtime, less-noisy estimates
 end
 
 % NOTE: uncertainty here (and below) is equivalent to one standard deviation of a Gaussian distribution 
@@ -31,7 +33,6 @@ par.ECDSA_keySize = 256; % Bitcoin is 256-bit, for reference, as are most 'altco
 % this model will work on any of the following key sizes tho    ugh: [256 384 521];
 
 % Options:
-opt.nSamples = 1000; % higher count --> longer runtime, less-noisy estimates
 opt.nYears = 100; % should be large enough to contain the majority of the resulting probability distribution distribution
 % if 100 is too 'zoomed-out' 50 is a good option
 
@@ -202,16 +203,11 @@ if opt.wannaPlot
 end
 
 results = cumulativeProb;
-% results.year_50percentRisk = find(cumulativeProb>0.5,1,'first');
-% results.mostLikelyYearBroken = mode(howLong_tilBroken);
-% results.howLong_tilBroken = howLong_tilBroken;
-
-
-
 
 % you can save a file containing the results, parameters, and options that
 % you used by setting 'wannaSave' to 1 in the input parameters.
-filename = ['assets/cumulative_prob_' paramStr];
+filename = ['assets/raw/c' paramStr];
+
 if opt.wannaSaveResults
     dlmwrite(filename, results, 'precision',2);
 end

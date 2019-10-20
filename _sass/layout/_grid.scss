@@ -1,0 +1,35 @@
+/* 
+ * Horizontal Grid
+ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-column-gap: $margin;
+  grid-row-gap: $margin;
+  max-width: $grid-maxwidth;
+  margin:0 auto;
+
+  > .w1 { grid-column: span 1; }
+  > .w2 { grid-column: span 2; }
+  > .w3 { grid-column: span 3; }
+  > .w4 { grid-column: span 4; }
+  > .w5 { grid-column: span 5; }
+  > .w6 { grid-column: span 6; }
+  > .w7 { grid-column: span 7; }
+  > .w8 { grid-column: span 8; }
+  > .w9 { grid-column: span 9; }
+  > .w10 { grid-column: span 10; }
+  > .w11 { grid-column: span 11; }
+  > .w12 { grid-column: span 12; }
+}
+
+
+.grid.collapse {
+  grid-column-gap: 0;
+  grid-row-gap: 0;
+}
+.grid.no-padding {
+  > div {
+    padding:0;
+  }
+}

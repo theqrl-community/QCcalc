@@ -1,6 +1,16 @@
 /**
  * 
  */
- body {
- 	max-width:1000px;
- }
+$margin: 1em;
+$grid-maxwidth: 1024px;
+
+body {
+	font-family: "Roboto", sans-serif;
+}
+
+footer {
+	text-align: center;
+	font-size:80%;
+}
+
+@import 'layout/grid';

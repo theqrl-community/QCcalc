@@ -12,6 +12,7 @@ defaults:
       layout: "default"
 # Build settings
 markdown: kramdown
+exclude: ['assets/raw/']
 kramdown:
   extensions: [footnotes] 
 local_theme: qccalc
