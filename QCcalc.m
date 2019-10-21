@@ -16,7 +16,7 @@ par.yearly_errorRateImprovement = str2num(argv(){2}); % in percent (0-100) -- no
 par.yearly_algorithmicImprovement = str2num(argv(){3}); % in percent(0-100) -- note: 50% = cutting the # of LOGICAL qubits required in half every year
 par.parameter_uncertainty = str2num(argv(){4}); % percent uncertainty about the above parameters
 par.req_runTime = str2num(argv(){5}); % hours (default: 1 week)
-opt.nSamples = 200; % higher count --> longer runtime, less-noisy estimates
+opt.nSamples = str2num(argv(){6}); % higher count --> longer runtime, less-noisy estimates
 end
 
 % NOTE: uncertainty here (and below) is equivalent to one standard deviation of a Gaussian distribution 
@@ -209,5 +209,5 @@ results = cumulativeProb;
 filename = ['assets/raw/c' paramStr];
 
 if opt.wannaSaveResults
-    dlmwrite(filename, results, 'precision',2);
+    dlmwrite(filename, results, 'precision',3);
 end

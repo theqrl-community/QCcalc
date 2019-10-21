@@ -3,23 +3,26 @@ function range(start, count) {
     .map((element, index) => index + start);
 }
 
-var stuff = {"cumulative_prob_168hrs_25x25x25x25_100yrs":new Array(100).fill(0) };
+var stuff = {"c168hrs_25x25x25x25_100yrs":new Array(100).fill(0) };
 
 var data = [{
   x: range(2019,100),
-  y: stuff["cumulative_prob_168hrs_25x25x25x25_100yrs"],
+  y: stuff["c168hrs_25x25x25x25_100yrs"],
   type: 'bar'
 }];
 
 var layout = {
+    title: "Quantum Threat",
     yaxis: {
+        title: "Cumulative chance of compromise",
         autorange: false,
+        tickformat: '.1%',
         range: [0,1],
         showgrid: false
     },
     xaxis: {
-        autorange: true,
-        range: [2019,2060]
+        title: "year",
+        autorange: true
     },
     // to highlight the timestamp we use shapes and create a rectangular
     shapes: [
@@ -73,10 +76,6 @@ var layout = {
 };
 Plotly.newPlot('myDiv', data, layout, {responsive: true});
 
-function plott() {
-	Plotly.restyle('myDiv', 'y', [stuff["cumulative_prob_168hrs_25x25x25x25_100yrs"]]);	
-}
-
 function update_plot() {
   	var increaseInQubits = $('.qc_progress [name=increaseInQubits]').val();
   	var algorithmicImprovement = $('.qc_progress [name=algorithmicImprovement]').val();
@@ -84,29 +83,39 @@ function update_plot() {
   	var runtime = $('.qc_progress [name=runTime]').val();
     var uncertainty = $('.qc_progress [name=uncertainty]').val();
 
-  	var text = "cumulative_prob_"+runtime+"hrs_"+increaseInQubits+"x"+algorithmicImprovement+"x"+errorRateImprovement+"x"+uncertainty+"_100yrs";
+  	var text = "c"+runtime+"hrs_"+increaseInQubits+"x"+algorithmicImprovement+"x"+errorRateImprovement+"x"+uncertainty+"_100yrs";
 
   	console.log(text,[stuff[text]]);
 
-	Plotly.animate('myDiv', 
-		{
-			data: [ {y: stuff[text] }],
-			traces: [0]
+    var start_year = 2019;
+    var end_year = 2019 + stuff[text].length;
+
+    console.log("End Year: "+end_year);
+
+	Plotly.animate('myDiv', {
+        layout: {
+            xaxis: {range: [2019, end_year]}
+        },
+		data: [{
+                y: stuff[text]        
+            }],
+            traces: [0]
 		}, 
 		{
 			transition: {
-			 	duration: 50,
+			 	duration: 250,
 			 	easing: 'cubic-in-out'
 			},
 			frame: {
-				duration: 50
+				duration: 250
 			}
 		});
+
 }
 
 
 $(function() {
-	$.getJSON("/assets/0.json",function(json){
+	$.getJSON("/assets/qccalc.json",function(json){
     	stuff = json;   
     	update_plot();       
 	});    
