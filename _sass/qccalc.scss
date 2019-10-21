@@ -1,0 +1,17 @@
+/**
+ * 
+ */
+$margin: 1em;
+$grid-maxwidth: 1024px;
+
+body {
+	font-family: "Roboto", sans-serif;
+	background-color:#DDD;
+}
+
+footer {
+	text-align: center;
+	font-size:80%;
+}
+
+@import 'layout/grid';

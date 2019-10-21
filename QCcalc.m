@@ -1,17 +1,29 @@
+pkg load statistics
 clear; close all;
 
-%% INPUT PARAMETERS
-% set these values for yourself
 par.yearly_increaseInQubits = 10; % in percent (0-100) -- note: 100% improvement is doubling the # qubits every year.
 par.yearly_errorRateImprovement = 10; % in percent (0-100) -- note: 50% = cutting the error rate in half every year.
 par.yearly_algorithmicImprovement = 10; % in percent(0-100) -- note: 50% = cutting the # of LOGICAL qubits required in half every year
 par.parameter_uncertainty = 10; % percent uncertainty about the above parameters
+par.req_runTime = 24*7*1; % hours (default: 1 week)
+opt.nSamples = 50; % higher count --> longer runtime, less-noisy estimates
+
+%% INPUT PARAMETERS
+% set these values for yourself
+if length(argv()) == 6
+par.yearly_increaseInQubits = str2num(argv(){1}); % in percent (0-100) -- note: 100% improvement is doubling the # qubits every year.
+par.yearly_errorRateImprovement = str2num(argv(){2}); % in percent (0-100) -- note: 50% = cutting the error rate in half every year.
+par.yearly_algorithmicImprovement = str2num(argv(){3}); % in percent(0-100) -- note: 50% = cutting the # of LOGICAL qubits required in half every year
+par.parameter_uncertainty = str2num(argv(){4}); % percent uncertainty about the above parameters
+par.req_runTime = str2num(argv(){5}); % hours (default: 1 week)
+opt.nSamples = str2num(argv(){6}); % higher count --> longer runtime, less-noisy estimates
+end
+
 % NOTE: uncertainty here (and below) is equivalent to one standard deviation of a Gaussian distribution 
 % centered on the given parameter's specified value
 par.maximum_acceptableRisk = 1; % the maximum acceptable percent chance that ECDSA is cracked in a given year;
 % once that chance exceeds this value, ECDSA is defined as "broken"
-par.req_runTime = 24*7*1; % hours (default: 1 week)
-par.public_nPhysQubits = 72; % from Google's Bristlecone chip.
+par.public_nPhysQubits = 56; % from Google's Bristlecone chip.
 % Rigetti's 128 qubit machine is a slightly less conservative alternative
 par.public_physErrRate = 0.001; % 0.1 percent
 
@@ -21,12 +33,11 @@ par.ECDSA_keySize = 256; % Bitcoin is 256-bit, for reference, as are most 'altco
 % this model will work on any of the following key sizes tho    ugh: [256 384 521];
 
 % Options:
-opt.nSamples = 5000; % higher count --> longer runtime, less-noisy estimates
 opt.nYears = 100; % should be large enough to contain the majority of the resulting probability distribution distribution
 % if 100 is too 'zoomed-out' 50 is a good option
 
-opt.wannaSaveResults = 0;
-opt.wannaPlot = 1; % if 0, will not generate plots
+opt.wannaSaveResults = 1;
+opt.wannaPlot = 0; % if 0, will not generate plots
 opt.wannaSavePlots = 0; % if 0, wil not save the plots
 opt.plotGridlines = 1; % adds gridlines to the cumulative probability plot
 opt.figSize = [5 3]; % default: [5 3];
@@ -126,6 +137,7 @@ for sample = 1:opt.nSamples
         catch
             chanceBroken(sample,year) = NaN; % in case some NaN or Inf arises from extreme parameter values above
         end
+
     end
     clearvars qubitGrowth errRateGrowth extrap_physErr codeDistance PhysQubits_perLogQubit ...
         logical_errRate req_nPhysQubits extrap_nPhysQubits extrap_nPhysQubits_SD
@@ -145,9 +157,12 @@ end
 cumulativeProb = nansum(chanceBroken,1)/opt.nSamples;
 disp(['50% chance of being broken in ' num2str(find(cumulativeProb>0.5,1,'first')) ' years']);
 disp(['most likely year to be broken in: ' num2str(mode(howLong_tilBroken))]);
-paramStr = [num2str(round(par.yearly_increaseInQubits)) 'x' num2str(round(par.yearly_errorRateImprovement)) ...
+paramStr = [num2str(round(par.req_runTime)) 'hrs_' num2str(round(par.yearly_increaseInQubits)) 'x' num2str(round(par.yearly_errorRateImprovement)) ...
     'x' num2str(round(par.yearly_algorithmicImprovement)) 'x' num2str(round(par.parameter_uncertainty)) '_' ...
-    num2str(round(par.req_runTime)) 'hrs_' num2str(round(opt.nYears)) 'yrs'];
+     num2str(round(opt.nYears)) 'yrs'];
+
+
+% fprintf('%f,', cumulativeProb);
 
 %% Plots and saving
 if opt.wannaPlot
@@ -160,6 +175,7 @@ if opt.wannaPlot
     set(h,'FaceColor',[218 0 0]/255)
     xlim([0 opt.nYears]);
     binCounts = histc(howLong_tilBroken,2:opt.histogramBinSize:opt.nYears);
+
     ylim([0 max(binCounts)*1.10]); % get consistent y limits
     if opt.inclFigTitles, title('How long it will take for QCs to break ECDSA','FontSize',10); end
     if opt.inclYlabel, ylabel('relative likelihood','FontSize',10); end
@@ -186,14 +202,12 @@ if opt.wannaPlot
     if opt.wannaSavePlots, print(gcf, ['cumulativeDist_' paramStr], '-dpng', '-r300' ); end
 end
 
-results.cumulativeProb = cumulativeProb;
-results.year_50percentRisk = find(cumulativeProb>0.5,1,'first');
-results.mostLikelyYearBroken = mode(howLong_tilBroken);
-results.howLong_tilBroken = howLong_tilBroken;
+results = cumulativeProb;
 
 % you can save a file containing the results, parameters, and options that
 % you used by setting 'wannaSave' to 1 in the input parameters.
-filename = ['QC_threatCalc_' paramStr];
+filename = ['assets/raw/c' paramStr];
+
 if opt.wannaSaveResults
-    save(filename,'results','par','opt');
+    dlmwrite(filename, results, 'precision',3);
 end
